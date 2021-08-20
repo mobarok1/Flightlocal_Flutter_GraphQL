@@ -105,6 +105,15 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
+  Widget continueButton(){
+    return TextButton(
+        onPressed: (){
+          Navigator.push(context, MaterialPageRoute(builder: (ctx)=>PackageList()));
+        },
+        child: Text("Continue without login",style: TextStyle(fontSize: 16),)
+    );
+  }
+
   Widget loginButton(){
     return ElevatedButton(
         onPressed: (){
@@ -119,9 +128,10 @@ class _LoginPageState extends State<LoginPage> {
             padding: MaterialStateProperty.resolveWith((states) =>EdgeInsets.symmetric(vertical: 15)),
             shape: MaterialStateProperty.resolveWith((states) => RoundedRectangleBorder(borderRadius: BorderRadius.all(Radius.circular(5))))
         ),
-        child: Text("Login")
+        child: Text("Login",style: TextStyle(fontSize: 16,fontWeight: FontWeight.bold),)
     );
   }
+
 
   @override
   void initState() {
@@ -157,6 +167,8 @@ class _LoginPageState extends State<LoginPage> {
                           _emailPasswordWidget(),
                           SizedBox(height: 20),
                           loginButton(),
+                          SizedBox(height: 20),
+                          continueButton()
                         ],
                       ),
                     ),
