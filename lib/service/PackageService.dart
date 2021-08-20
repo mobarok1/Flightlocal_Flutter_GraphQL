@@ -4,18 +4,18 @@ import 'package:frontend_application_test/service/GraphQlClient.dart';
 import 'package:graphql/client.dart';
 
 class PackageService{
-  static Future<PackageListResponseModel?> getAvailablePackage() async{
+  static Future<PackageListResponseModel?> getAvailablePackage(int skip,int limit) async{
     final GraphQLClient _client = getSecureGraphQLClient();
     PackageListResponseModel? responseModel;
 
     final QueryOptions options = QueryOptions(
       document: gql(
         r'''
-        {
+        query($skip:Int,$limit : Int){
           getPackages(
-            pagination: {
-              skip: 0
-              limit: 10
+            pagination:{
+              skip: $skip
+              limit: $limit
             }
           )
           {
@@ -45,7 +45,12 @@ class PackageService{
         }
       ''',
       ),
+      variables: {
+        "skip":skip,
+        "limit":limit
+      }
     );
+    print("skip $skip and limit $limit");
     final QueryResult result = await _client.query(options);
     int responseCode = 500;
     int count = 0;
@@ -53,7 +58,6 @@ class PackageService{
     if (result.hasException) {
       responseModel = PackageListResponseModel(statusCode: responseCode,count: count, message: message,packages: []);
     }else{
-      print(result.data);
       var response = result.data;
       var _data = response!["getPackages"];
       responseCode = _data["statusCode"];

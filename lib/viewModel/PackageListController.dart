@@ -8,6 +8,8 @@ class PackageListController extends GetxController{
   var count = 0.obs;
   var loading = false.obs;
   var error = false.obs;
+  int perPage = 4;
+  int skip = 0;
 
   @override
   void onInit(){
@@ -18,10 +20,12 @@ class PackageListController extends GetxController{
 
   loadDataFromServer() async{
     loading.value = true;
-    PackageListResponseModel? response =  await PackageService.getAvailablePackage();    loading.value = false;
+    PackageListResponseModel? response =  await PackageService.getAvailablePackage(skip,perPage);
+    skip = skip+perPage;
+    loading.value = false;
     error.value = response==null?true:response.statusCode==200?false:true;
     if(!error.value){
-      packageList.value = response!.packages;
+      packageList.addAll(response!.packages);
       count.value = response.count;
     }else{
       count.value = 0;

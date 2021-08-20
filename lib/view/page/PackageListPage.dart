@@ -19,6 +19,32 @@ class PackageList extends StatefulWidget {
 class _PackageListState extends State<PackageList> {
 
   PackageListController packageListController = Get.put(PackageListController());
+  late ScrollController controller;
+  bool loadCalled = false;
+
+
+  @override
+  void initState() {
+    super.initState();
+    controller = new ScrollController()..addListener(_scrollListener);
+  }
+
+  @override
+  void dispose() {
+    controller.removeListener(_scrollListener);
+    super.dispose();
+  }
+  void _scrollListener() async{
+    if (controller.position.extentAfter < 500) {
+      if(!packageListController.loading.value && packageListController.count > packageListController.packageList.length && !loadCalled){
+        loadCalled = true;
+        await packageListController.loadDataFromServer();
+        loadCalled = false;
+      }
+    }
+  }
+
+
 
   Widget getTitle(){
     return RichText(
@@ -253,17 +279,6 @@ class _PackageListState extends State<PackageList> {
         backgroundColor: Colors.white,
         centerTitle: false,
         title: getTitle(),
-        actions: [
-          IconButton(
-              onPressed: (){
-                packageListController.loadDataFromServer();
-              },
-              icon: Icon(
-                  Icons.refresh,
-                  color: MAIN_COLOR,
-              )
-          )
-        ],
       ),
       body: Column(
         children: [
@@ -279,20 +294,28 @@ class _PackageListState extends State<PackageList> {
           )),
           Flexible(
               child: Obx(()=>
-                  packageListController.loading.value? SpinKitCircle(
-                    color: MAIN_COLOR,
-                    size: 70,
-                  ):
-                  ListView.separated(
-                    padding: EdgeInsets.symmetric(horizontal: 15),
-                    itemBuilder: (ctx,i){
-                      return getPackageCardView(packageListController.packageList[i]);
-                    },
-                    separatorBuilder: (BuildContext context, int index) {
-                      return SizedBox(height: 15,);
-                    },
-                    itemCount: packageListController.packageList.length,
-                  )
+                    Column(
+                    children: [
+                      Flexible(
+                        child: ListView.separated(
+                          padding: EdgeInsets.symmetric(horizontal: 15),
+                          controller: controller,
+                          itemBuilder: (ctx,i){
+                            return getPackageCardView(packageListController.packageList[i]);
+                          },
+                          separatorBuilder: (BuildContext context, int index) {
+                            return SizedBox(height: 15,);
+                          },
+                          itemCount: packageListController.packageList.length,
+                        ),
+                      ),
+                      packageListController.loading.value? SpinKitCircle(
+                        color: MAIN_COLOR,
+                        size: 70,
+                      ):Container()
+                    ],
+                  ),
+
               )
           )
         ],
