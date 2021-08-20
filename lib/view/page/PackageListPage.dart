@@ -92,6 +92,7 @@ class _PackageListState extends State<PackageList> {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(package.title,
+                              maxLines: 2,
                               style: GoogleFonts.roboto (
                                   fontSize: 20,
                                   fontWeight: FontWeight.w900,
@@ -103,7 +104,7 @@ class _PackageListState extends State<PackageList> {
                                   fontSize: 14,
 
                               ),
-                              maxLines: 4,
+                              maxLines: 3,
                               overflow: TextOverflow.ellipsis,
                             ),
                             SizedBox(height: 5,),
